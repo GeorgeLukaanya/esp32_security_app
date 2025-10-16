@@ -10,10 +10,12 @@ class BluetoothService {
       // Request BLUETOOTH_CONNECT and BLUETOOTH_SCAN permissions
       final connectStatus = await Permission.bluetoothConnect.request();
       final scanStatus = await Permission.bluetoothScan.request();
+      final notificationStatus = await Permission.notification.request();
 
       if (kDebugMode) {
         debugPrint('BLUETOOTH_CONNECT: $connectStatus');
         debugPrint('BLUETOOTH_SCAN: $scanStatus');
+        debugPrint('NOTIFICATION: $notificationStatus');
       }
 
       return connectStatus.isGranted && scanStatus.isGranted;
