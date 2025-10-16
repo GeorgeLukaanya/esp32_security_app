@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'theme/app_theme.dart';
+import 'package:provider/provider.dart';
+import 'utils/theme_provider.dart';
 import 'screens/home_screen.dart';
 
 void main() {
@@ -11,11 +12,18 @@ class Esp32SecurityApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'ESP32 Security',
-      theme: AppTheme.darkTheme,
-      home: const HomeScreen(),
+    return ChangeNotifierProvider(
+      create: (_) => ThemeProvider(),
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, _) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'ESP32 Security',
+            theme: themeProvider.getTheme(),
+            home: const HomeScreen(),
+          );
+        },
+      ),
     );
   }
 }

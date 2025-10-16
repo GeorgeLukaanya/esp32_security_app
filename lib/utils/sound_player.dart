@@ -1,6 +1,8 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'storage_service.dart';
+import 'package:intl/intl.dart';
 
 class SoundPlayer {
   final AudioPlayer _player = AudioPlayer();
@@ -9,6 +11,34 @@ class SoundPlayer {
 
   SoundPlayer() {
     _initializeNotifications();
+    _initializeAudioPlayer();
+  }
+
+  Future<void> _initializeAudioPlayer() async {
+    try {
+      // Set the audio context for proper playback
+      await _player.setAudioContext(
+        AudioContext(
+          iOS: AudioContextIOS(
+            category: AVAudioSessionCategory.playback,
+            options: {
+              AVAudioSessionOptions.duckOthers,
+              AVAudioSessionOptions.defaultToSpeaker,
+            },
+          ),
+          android: AudioContextAndroid(
+            audioFocus: AndroidAudioFocus.gainTransient,
+          ),
+        ),
+      );
+      if (kDebugMode) {
+        debugPrint('Audio player initialized successfully');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('Error initializing audio player: $e');
+      }
+    }
   }
 
   Future<void> _initializeNotifications() async {
@@ -42,32 +72,30 @@ class SoundPlayer {
 
   Future<void> playFireAlert() async {
     try {
-      // Set volume to maximum and enable speaker
+      // Stop any currently playing sound
+      await _player.stop();
+
+      // Set volume to maximum
       await _player.setVolume(1.0);
+
+      // Set release mode to stop (prevents overlapping sounds)
       await _player.setReleaseMode(ReleaseMode.stop);
 
-      // Route audio to speaker
-      await _player.setAudioContext(
-        AudioContext(
-          iOS: AudioContextIOS(
-            category: AVAudioSessionCategory.playback,
-            options: {
-              AVAudioSessionOptions.duckOthers,
-              AVAudioSessionOptions.defaultToSpeaker,
-            },
-          ),
-          android: AudioContextAndroid(
-            audioFocus: AndroidAudioFocus.gainTransient,
-          ),
-        ),
-      );
-
-      // Play the sound file
-      await _player.play(AssetSource('sounds/fire_alert.mp3'));
-
-      if (kDebugMode) {
-        debugPrint('Playing fire alert sound');
-      }
+      // Play the sound file with proper error handling
+      final source = AssetSource('sounds/fire_alert.mp3');
+      await _player
+          .play(source)
+          .then((_) {
+            if (kDebugMode) {
+              debugPrint('Fire alert sound playback started');
+            }
+          })
+          .catchError((error) {
+            if (kDebugMode) {
+              debugPrint('Error starting fire alert playback: $error');
+            }
+            throw error;
+          });
 
       // Show notification
       await _showNotification(
@@ -75,41 +103,53 @@ class SoundPlayer {
         body: 'Fire detected! Immediate action required!',
         tag: 'fire_alert',
       );
+
+      // Log the emergency event
+      final timestamp = DateFormat(
+        'yyyy-MM-dd HH:mm:ss',
+      ).format(DateTime.now());
+      await StorageService.saveEmergencyLog(
+        EmergencyLog(
+          timestamp: timestamp,
+          alertType: 'FIRE',
+          description: 'Fire detected by sensor',
+          sensorData: {'alert': 'FIRE'},
+        ),
+      );
     } catch (e) {
       if (kDebugMode) {
         debugPrint('Error playing fire alert: $e');
       }
+      rethrow;
     }
   }
 
   Future<void> playMagnetAlert() async {
     try {
-      // Set volume to maximum and enable speaker
+      // Stop any currently playing sound
+      await _player.stop();
+
+      // Set volume to maximum
       await _player.setVolume(1.0);
+
+      // Set release mode to stop (prevents overlapping sounds)
       await _player.setReleaseMode(ReleaseMode.stop);
 
-      // Route audio to speaker
-      await _player.setAudioContext(
-        AudioContext(
-          iOS: AudioContextIOS(
-            category: AVAudioSessionCategory.playback,
-            options: {
-              AVAudioSessionOptions.duckOthers,
-              AVAudioSessionOptions.defaultToSpeaker,
-            },
-          ),
-          android: AudioContextAndroid(
-            audioFocus: AndroidAudioFocus.gainTransient,
-          ),
-        ),
-      );
-
-      // Play the sound file
-      await _player.play(AssetSource('sounds/magnetic_alert.mp3'));
-
-      if (kDebugMode) {
-        debugPrint('Playing magnetic alert sound');
-      }
+      // Play the sound file with proper error handling
+      final source = AssetSource('sounds/magnetic_alert.mp3');
+      await _player
+          .play(source)
+          .then((_) {
+            if (kDebugMode) {
+              debugPrint('Magnetic alert sound playback started');
+            }
+          })
+          .catchError((error) {
+            if (kDebugMode) {
+              debugPrint('Error starting magnetic alert playback: $error');
+            }
+            throw error;
+          });
 
       // Show notification
       await _showNotification(
@@ -117,10 +157,24 @@ class SoundPlayer {
         body: 'Magnetic field detected!',
         tag: 'magnetic_alert',
       );
+
+      // Log the emergency event
+      final timestamp = DateFormat(
+        'yyyy-MM-dd HH:mm:ss',
+      ).format(DateTime.now());
+      await StorageService.saveEmergencyLog(
+        EmergencyLog(
+          timestamp: timestamp,
+          alertType: 'MAGNET',
+          description: 'Magnetic field detected by sensor',
+          sensorData: {'alert': 'MAGNET'},
+        ),
+      );
     } catch (e) {
       if (kDebugMode) {
         debugPrint('Error playing magnetic alert: $e');
       }
+      rethrow;
     }
   }
 
