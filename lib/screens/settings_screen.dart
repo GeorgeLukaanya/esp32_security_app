@@ -90,7 +90,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('⚙️ Settings'),
+        title: const Text('Settings'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
@@ -222,7 +222,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   ),
                                 ),
                                 const SizedBox(height: 4),
-                                const Text('🔥 Fire'),
+                                const Text('🔥'),
                               ],
                             ),
                           ),
@@ -244,7 +244,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   ),
                                 ),
                                 const SizedBox(height: 4),
-                                const Text('🧲 Magnet'),
+                                const Text('🧲'),
                               ],
                             ),
                           ),
@@ -333,7 +333,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         // Clear Logs Button
                         ElevatedButton.icon(
                           icon: const Icon(Icons.delete_outline),
-                          label: const Text('🗑️ Clear All Logs'),
+                          label: const Text('🗑️'),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.redAccent,
                             foregroundColor: Colors.white,

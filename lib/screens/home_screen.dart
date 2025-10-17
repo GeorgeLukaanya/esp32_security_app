@@ -145,7 +145,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("🔒 ESP32 Security System"),
+        title: const Text("ESP32 Security System"),
         centerTitle: true,
         elevation: 4,
         actions: [
@@ -265,7 +265,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                 // Command Buttons Section
                 Text(
-                  '📲 Commands',
+                  'Commands',
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -280,7 +280,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ElevatedButton.icon(
                         onPressed: _showDeviceSelectionDialog,
                         icon: const Icon(Icons.bluetooth_connected),
-                        label: const Text("🔗 Connect to ESP32"),
+                        label: const Text("Connect to ESP32"),
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           backgroundColor: Colors.deepOrangeAccent,
@@ -307,7 +307,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         showDialog(
                           context: context,
                           builder: (context) => AlertDialog(
-                            title: const Text('🔊 Test Alert Sounds'),
+                            title: const Text('Test Alert Sounds'),
                             content: const Text(
                               'Select an alert to test if sound is working correctly on your device.',
                             ),
@@ -335,7 +335,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         );
                       },
                       icon: const Icon(Icons.speaker_phone),
-                      label: const Text("🔊 Test Sounds"),
+                      label: const Text("Test Sounds"),
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         backgroundColor: Colors.blueAccent,
@@ -355,7 +355,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         );
                       },
                       icon: const Icon(Icons.settings),
-                      label: const Text("⚙️ Settings & Logs"),
+                      label: const Text("Settings & Logs"),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
