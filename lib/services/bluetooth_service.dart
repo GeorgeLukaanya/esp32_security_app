@@ -108,6 +108,32 @@ class BluetoothService {
     });
   }
 
+  /// 🔹 Send commands to ESP32 device
+  /// Expected commands: "ack", "status", "cal", "reset"
+  Future<void> sendCommand(String command) async {
+    if (connection == null) {
+      throw Exception('Not connected to device');
+    }
+
+    try {
+      // Add newline to match ESP32 readStringUntil('\n')
+      final commandWithNewline = '${command.trim()}\n';
+      final bytes = Uint8List.fromList(commandWithNewline.codeUnits);
+
+      connection!.output.add(bytes);
+      await connection!.output.allSent;
+
+      if (kDebugMode) {
+        debugPrint('✅ Command sent: $command');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('❌ Error sending command: $e');
+      }
+      rethrow;
+    }
+  }
+
   void dispose() {
     connection?.dispose();
     connection = null;

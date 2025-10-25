@@ -135,6 +135,52 @@ class _HomeScreenState extends State<HomeScreen> {
     ).showSnackBar(const SnackBar(content: Text('Disconnected from device')));
   }
 
+  /// 🔹 Send command to ESP32 device
+  /// Supported commands: "ack", "status", "cal", "reset"
+  void _sendCommand(String command) {
+    try {
+      _bluetoothService.sendCommand(command);
+
+      // Show feedback to user
+      String feedbackMessage = '';
+      switch (command) {
+        case 'ack':
+          feedbackMessage = 'Silencing alert...';
+          break;
+        case 'status':
+          feedbackMessage = 'Requesting device status...';
+          break;
+        case 'cal':
+          feedbackMessage = 'Calibrating sensors...';
+          break;
+        case 'reset':
+          feedbackMessage = 'Resetting device...';
+          break;
+        default:
+          feedbackMessage = 'Command sent: $command';
+      }
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(feedbackMessage),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error sending command: $e'),
+            duration: const Duration(seconds: 3),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   void dispose() {
     _bluetoothService.dispose();
@@ -343,6 +389,95 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     const SizedBox(height: 12),
+
+                    // Device Control Section (Only when connected)
+                    if (_connectedDeviceName != null) ...[
+                      // Title for device controls
+                      Text(
+                        '📱 Device Controls',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+
+                      // Grid of control buttons
+                      GridView.count(
+                        crossAxisCount: 2,
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        mainAxisSpacing: 8,
+                        crossAxisSpacing: 8,
+                        children: [
+                          // Silence Alert Button
+                          ElevatedButton.icon(
+                            onPressed: () => _sendCommand('ack'),
+                            icon: const Icon(Icons.volume_off, size: 20),
+                            label: const Text(
+                              'Silence',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(fontSize: 12),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.orange,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.all(8),
+                            ),
+                          ),
+
+                          // Get Status Button
+                          ElevatedButton.icon(
+                            onPressed: () => _sendCommand('status'),
+                            icon: const Icon(Icons.info, size: 20),
+                            label: const Text(
+                              'Status',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(fontSize: 12),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.cyan,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.all(8),
+                            ),
+                          ),
+
+                          // Calibrate Button
+                          ElevatedButton.icon(
+                            onPressed: () => _sendCommand('cal'),
+                            icon: const Icon(Icons.tune, size: 20),
+                            label: const Text(
+                              'Calibrate',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(fontSize: 12),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.purple,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.all(8),
+                            ),
+                          ),
+
+                          // Reset Button
+                          ElevatedButton.icon(
+                            onPressed: () => _sendCommand('reset'),
+                            icon: const Icon(Icons.restart_alt, size: 20),
+                            label: const Text(
+                              'Reset',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(fontSize: 12),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.teal,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.all(8),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                    ],
 
                     // Settings Button
                     OutlinedButton.icon(
