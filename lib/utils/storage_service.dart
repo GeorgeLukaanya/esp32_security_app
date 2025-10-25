@@ -145,4 +145,72 @@ class StorageService {
     final logs = await getAllLogs();
     return logs.where((log) => log.alertType == 'MAGNET').toList();
   }
+
+  /// Get logs for a specific date
+  static Future<List<EmergencyLog>> getLogsForDate(DateTime date) async {
+    final logs = await getAllLogs();
+    final dateString =
+        '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+    return logs.where((log) => log.timestamp.startsWith(dateString)).toList();
+  }
+
+  /// Get logs within a date range (inclusive)
+  static Future<List<EmergencyLog>> getLogsForDateRange(
+    DateTime startDate,
+    DateTime endDate,
+  ) async {
+    final logs = await getAllLogs();
+    final adjustedEndDate = endDate.add(const Duration(days: 1));
+    return logs.where((log) {
+      try {
+        final logDate = DateTime.parse(log.timestamp);
+        return logDate.isAfter(startDate) && logDate.isBefore(adjustedEndDate);
+      } catch (e) {
+        return false;
+      }
+    }).toList();
+  }
+
+  /// Get logs for today
+  static Future<List<EmergencyLog>> getLogsForToday() async {
+    return getLogsForDate(DateTime.now());
+  }
+
+  /// Get logs for this week (Monday to Sunday)
+  static Future<List<EmergencyLog>> getLogsForThisWeek() async {
+    final now = DateTime.now();
+    final weekStart = now.subtract(Duration(days: now.weekday - 1));
+    return getLogsForDateRange(weekStart, now);
+  }
+
+  /// Get logs for this month
+  static Future<List<EmergencyLog>> getLogsForThisMonth() async {
+    final now = DateTime.now();
+    final monthStart = DateTime(now.year, now.month, 1);
+    return getLogsForDateRange(monthStart, now);
+  }
+
+  /// Get daily alert counts for the last N days
+  static Future<Map<String, int>> getDailyAlertCounts(int days) async {
+    final logs = await getAllLogs();
+    final counts = <String, int>{};
+
+    // Initialize all days with 0
+    for (int i = 0; i < days; i++) {
+      final date = DateTime.now().subtract(Duration(days: i));
+      final dateString =
+          '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+      counts[dateString] = 0;
+    }
+
+    // Count alerts per day
+    for (var log in logs) {
+      final dateString = log.timestamp.substring(0, 10);
+      if (counts.containsKey(dateString)) {
+        counts[dateString] = (counts[dateString] ?? 0) + 1;
+      }
+    }
+
+    return counts;
+  }
 }
