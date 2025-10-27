@@ -337,7 +337,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ElevatedButton.icon(
                         onPressed: _disconnect,
                         icon: const Icon(Icons.bluetooth_disabled),
-                        label: const Text("❌ Disconnect Device"),
+                        label: const Text("Disconnect Device"),
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           backgroundColor: Colors.redAccent,
@@ -394,7 +394,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     if (_connectedDeviceName != null) ...[
                       // Title for device controls
                       Text(
-                        '📱 Device Controls',
+                        'Device Controls',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
